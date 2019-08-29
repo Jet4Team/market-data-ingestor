@@ -1,2 +1,2 @@
-# binance ingestor
+# Binance exchange ingestor
 L2 data ingestor from Binance exchange https://www.binance.com
