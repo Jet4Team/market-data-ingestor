@@ -9,4 +9,4 @@ L2 data ingestor from Binance exchange https://www.binance.com
 ## Contribution rules
 * Use https://github.com/rust-lang/rustfmt
 * Use .editorconfig https://editorconfig.org
-	* Install EditorConfig with Package Control and restart Sublime.
+* Install EditorConfig with Package Control and restart Sublime.
