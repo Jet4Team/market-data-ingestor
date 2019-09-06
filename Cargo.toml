@@ -12,6 +12,7 @@ tokio-tungstenite = "0.8.0"
 tokio = "0.1"
 futures = "0.1.28"
 url = "1.7.1"
+rdkafka = "~0.21"
 
 #hyper = "0.12" # reqwest = "0.9"
 #hyper-tls = "0.3"
