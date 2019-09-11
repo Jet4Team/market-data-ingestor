@@ -16,6 +16,7 @@
 // extern crate tokio_tungstenite;
 // extern crate uuid;
 
-// pub mod model;
+pub mod ws;
+pub mod producer;
 
 pub const WS_URL: &str = "wss://stream.binance.com:9443/ws/";
