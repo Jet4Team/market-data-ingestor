@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/jetl2/binance-ingestor.svg?token=GHtekntqUN4NMBayeZ7i&branch=master)](https://travis-ci.com/jetl2/binance-ingestor)
+
 # Binance exchange ingestor
 L2 data ingestor from Binance exchange https://www.binance.com
 
