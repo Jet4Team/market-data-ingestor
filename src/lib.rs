@@ -1,22 +1,49 @@
-// extern crate chrono;
-// #[macro_use]
-// extern crate failure;
-// extern crate futures;
-// extern crate hyper;
-// extern crate hyper_tls;
-// #[macro_use]
-// extern crate log;
-// extern crate pretty_env_logger;
-// extern crate serde;
-// #[macro_use]
-// extern crate serde_derive;
-// extern crate serde_json;
-// extern crate time;
-// extern crate tokio;
-// extern crate tokio_tungstenite;
-// extern crate uuid;
+extern crate futures;
+
+use ws::WSStream;
+use producer::Producer;
+use futures::{Future, Stream};
+use std::env;
 
 pub mod ws;
 pub mod producer;
 
-pub const WS_URL: &str = "wss://stream.binance.com:9443/ws/";
+fn get_env_var(name: &str) -> Result<String, String> {
+    let var = match env::var(name) {
+        Ok(val) => val,
+        Err(e) => return Err(e.to_string()),
+    };
+
+    if var.len() == 0 {
+        return Err(String::from(format!("{} env variable required", name)));
+    }
+
+    Ok(var)
+}
+
+pub fn run() -> Result<(), String> {
+
+    let kafka_brokers = get_env_var("KAFKA_BROKERS")?;
+    let kafka_topic = get_env_var("KAFKA_TOPIC")?;
+
+    let ws = WSStream::new("btcusdt");
+    let producer = Producer::new(kafka_brokers, kafka_topic);
+
+    let stream = ws
+        .for_each(move |message| {
+            //println!("{:?}", message);
+
+            let producer_future = producer.send(message)
+                .map_err(|e| println!("Producer error occurred: {:?}", e));
+
+            // executing in the tokio thread pool
+            tokio::spawn(producer_future);
+
+            Ok(())
+        })
+        .map_err(|e| println!("Websocket error occurred: {:?}", e));
+
+    tokio::run(stream);
+
+    Ok(())
+}
