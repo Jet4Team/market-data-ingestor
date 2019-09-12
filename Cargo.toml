@@ -6,6 +6,7 @@ authors = ["jetTeam"]
 publish = false
 license = "GPL-3.0"
 readme = "README.md"
+build = "src/build/build.rs"
 
 [dependencies]
 tokio-tungstenite = "0.9"
@@ -13,6 +14,9 @@ tokio = "0.1"
 futures = "0.1"
 url = "2.1"
 rdkafka = "0.21"
+
+[build-dependencies]
+built = "0.3"
 
 #hyper = "0.12" # reqwest = "0.9"
 #hyper-tls = "0.3"

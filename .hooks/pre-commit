@@ -1,0 +1,102 @@
+#!/bin/sh
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+PREFIX="${GREEN}[pre_commit]${NC}"
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+	against=HEAD
+else
+	# Initial commit: diff against an empty tree object
+	against=$(git hash-object -t tree /dev/null)
+fi
+
+# If you want to allow non-ASCII filenames set this variable to true.
+allownonascii=$(git config --bool hooks.allownonascii)
+
+# Redirect output to stderr.
+1>&2
+
+printf "${PREFIX} check non-ASCII filenames \n"
+
+if [ -z "$allownonascii" ]; then
+	printf "${PREFIX} ${YELLOW}set hooks.allownonascii variable to true to check non-ASCII filenames.${NC} \n"
+else
+	printf "${PREFIX} hooks.allownonascii=${allownonascii}. \n"
+fi
+
+# Cross platform projects tend to avoid non-ASCII filenames; prevent
+# them from being added to the repository. We exploit the fact that the
+# printable range starts at the space character and ends with tilde.
+if [ "$allownonascii" != "true" ] &&
+	# Note that the use of brackets around a tr range is ok here, (it's
+	# even required, for portability to Solaris 10's /usr/bin/tr), since
+	# the square bracket bytes happen to fall in the designated range.
+	test $(git diff --cached --name-only --diff-filter=A -z $against |
+	  LC_ALL=C tr -d '[ -~]\0' | wc -c) != 0
+then
+	cat <<\EOF
+Error: Attempt to add a non-ASCII file name.
+This can cause problems if you want to work with people on other platforms.
+To be portable it is advisable to rename the file.
+If you know what you are doing you can disable this check using:
+  git config hooks.allownonascii true
+EOF
+	exit 1
+fi
+
+printf "${PREFIX} ${GREEN}ok${NC} \n"
+
+printf "${PREFIX} check whitespace errors \n"
+
+# If there are whitespace errors, print the offending file names and fail.
+git diff-index --check --cached $against --
+
+printf "${PREFIX} ${GREEN}ok${NC} \n"
+
+rustfmt --version &>/dev/null
+if [ $? != 0 ]; then
+	printf "${PREFIX} ${RED}error${NC}: \"rustfmt\" not available. \n"
+	printf "${PREFIX} ${RED}merror${NC}: rustfmt can be installed via - \n"
+	printf "${PREFIX} rustup component add rustfmt-preview \n"
+	exit 1
+fi
+
+result=0
+problem_files=()
+
+printf "${PREFIX} check rustfmt \n"
+
+for file in $(git diff --name-only --cached); do
+	if [ ${file: -3} == ".rs" ]; then
+		# first collect all the files that need reformatting
+		rustfmt --check $file &>/dev/null
+		if [ $? != 0 ]; then
+			problem_files+=($file)
+			result=1
+		fi
+	fi
+done
+
+# now reformat all the files that need reformatting
+for file in ${problem_files[@]}; do
+	rustfmt $file
+done
+
+# and let the user know what just happened (and which files were affected)
+printf "${PREFIX} ${GREEN}ok${NC} \n"
+if [ $result != 0 ]; then
+	printf "${PREFIX} the following files were rustfmt'd (not yet committed): \n"
+
+	for file in ${problem_files[@]}; do
+		printf "${PREFIX} ${YELLOW}    $file${NC} \n"
+	done
+fi
+
+exit 0
+# to actually fail the build on rustfmt failure -
+# exit $result
