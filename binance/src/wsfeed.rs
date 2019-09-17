@@ -1,12 +1,7 @@
-extern crate tokio_tungstenite;
-extern crate tokio;
-extern crate futures;
-extern crate url;
-
-use self::tokio_tungstenite::connect_async;
-use self::tokio_tungstenite::tungstenite::protocol::Message as TMessage;
-use self::futures::{Future, Stream};
-use self::tokio_tungstenite::tungstenite::error::Error;
+use tokio_tungstenite::connect_async;
+use tokio_tungstenite::tungstenite::protocol::Message as TMessage;
+use tokio_tungstenite::tungstenite::error::Error;
+use futures::{Future, Stream};
 
 const WS_URL: &str = "wss://stream.binance.com:9443/ws";
 

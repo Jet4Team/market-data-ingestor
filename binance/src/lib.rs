@@ -1,27 +1,18 @@
+extern crate tokio_tungstenite;
 extern crate futures;
 
-use ws::WSStream;
-use producer::Producer;
 use futures::{Future, Stream};
-use std::env;
 
-pub mod ws;
-pub mod producer;
-
-fn get_env_var(name: &str) -> Result<String, String> {
-    match env::var(name) {
-        Ok(val) => Ok(val),
-        Err(e) => Err(String::from(format!("{} - {}", name, e.to_string()))),
-    }
-}
+mod wsfeed;
+use wsfeed::WSStream;
 
 pub fn run() -> Result<(), String> {
 
-    let kafka_brokers = get_env_var("KAFKA_BROKERS")?;
-    let kafka_topic = get_env_var("KAFKA_TOPIC")?;
+    let kafka_brokers = common::get_env_var("KAFKA_BROKERS")?;
+    let kafka_topic = common::get_env_var("KAFKA_TOPIC")?;
 
     let ws = WSStream::new("btcusdt");
-    let producer = Producer::new(kafka_brokers, kafka_topic);
+    let producer = common::producer::Producer::new(kafka_brokers, kafka_topic);
 
     let stream = ws
         .for_each(move |message| {

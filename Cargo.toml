@@ -8,8 +8,14 @@ license = "GPL-3.0"
 readme = "README.md"
 build = ".build/build.rs"
 
+[workspace]
+members = [
+    "binance",
+    "common",
+]
+
 [dependencies]
-l2-ingestor = { path = "l2-ingestor" }
+binance = { path = "binance"}
 tokio-tungstenite = "0.9"
 tokio = "0.1"
 futures = "0.1"

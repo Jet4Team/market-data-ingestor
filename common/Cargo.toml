@@ -1,0 +1,20 @@
+[package]
+name = "common"
+description = "Common library for ingestors"
+version = "0.1.0"
+authors = ["jetTeam"]
+publish = false
+license = "GPL-3.0"
+readme = "README.md"
+build = "../.build/build.rs"
+
+[dependencies]
+futures = "0.1"
+rdkafka = "0.21"
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+config = "0.9"
+
+[build-dependencies]
+built = "0.3"
