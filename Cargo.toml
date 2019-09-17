@@ -1,6 +1,6 @@
 [package]
-name = "binance-ingestor"
-description = "L2 data ingestor for Binance exchange"
+name = "market-data-ingestor"
+description = "Market data ingestor"
 version = "0.1.0"
 authors = ["jetTeam"]
 publish = false
