@@ -6,7 +6,6 @@ addons:
     packages:
       - libzstd
 
-
 before_install:
   - set -e
   - rustup self update
