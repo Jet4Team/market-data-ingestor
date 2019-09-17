@@ -8,32 +8,41 @@ use std::process::Command;
 use std::os::unix::fs::PermissionsExt;
 
 fn main() {
+
+    let hooks_dir = if PathBuf::from("../.hooks").exists() {
+        PathBuf::from("../.hooks")
+    } else  {
+        PathBuf::from(".hooks")
+    };
+
+    let pre_commit = PathBuf::from(format!("{}/{}", hooks_dir.to_str().unwrap(), "pre-commit"));
+
     // Setting up git hooks in the project: rustfmt and so on.
     let git_hooks = format!(
         "git config core.hooksPath {}",
-        PathBuf::from("./.hooks").to_str().unwrap()
+        hooks_dir.to_str().unwrap()
     );
 
     if cfg!(target_os = "windows") {
         Command::new("cmd")
             .args(&["/C", &git_hooks])
             .output()
-            .expect("failed to execute git config for hooks");
+            .expect("build: failed to execute git config for hooks");
     } else {
         Command::new("sh")
             .args(&["-c", &git_hooks])
             .output()
-            .expect("failed to execute git config for hooks");
+            .expect("build: failed to execute git config for hooks");
 
-        let mut permissions = PathBuf::from("./.hooks/pre-commit")
+        let mut permissions = pre_commit
             .metadata()
-            .expect("metadata call failed")
+            .expect("build: failed to get metadata of pre-commit")
             .permissions();
 
         if permissions.mode() & 0o111 != 0 {
             permissions.set_mode(0o770);
-            fs::set_permissions("./.hooks/pre-commit", permissions)
-                .expect("failed to set executable permissions");
+            fs::set_permissions(pre_commit, permissions)
+                .expect("build: failed to set executable permissions");
         }
     }
 

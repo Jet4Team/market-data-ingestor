@@ -9,16 +9,10 @@ pub mod ws;
 pub mod producer;
 
 fn get_env_var(name: &str) -> Result<String, String> {
-    let var = match env::var(name) {
-        Ok(val) => val,
-        Err(e) => return Err(e.to_string()),
-    };
-
-    if var.len() == 0 {
-        return Err(String::from(format!("{} env variable required", name)));
+    match env::var(name) {
+        Ok(val) => Ok(val),
+        Err(e) => Err(String::from(format!("{} - {}", name, e.to_string()))),
     }
-
-    Ok(var)
 }
 
 pub fn run() -> Result<(), String> {

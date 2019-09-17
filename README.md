@@ -15,7 +15,7 @@ L2 data ingestor from Binance exchange https://www.binance.com
 
 ## Local environment
 ### Kafka
-* use /kafka/docker-compose.yml
+* use .env/kafka/docker-compose.yml
 * run `docker-compose up -d` in /kafka directory or specify docker-compose file via `-f` option
 * Running kafka-docker on a Mac: Install the Docker Toolbox and set `KAFKA_ADVERTISED_HOST_NAME` to the IP that is returned by the `docker-machine ip` command.
 
