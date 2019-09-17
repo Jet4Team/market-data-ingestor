@@ -5,7 +5,7 @@ cache: cargo
 addons:
   apt:
     packages:
-      - libzstd
+      - libzstd-dev
 
 before_install:
   - set -e
